@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Dialog, DialogTrigger } from "../ui/dialog";
 import { NewFolderDialog } from "@/pages/Main/Workspace/FolderContents/Header/Toolbar/NewItemButton";
-import useExplorer from "@/context/Explorer";
+import useOperationStore from "@/store/operation";
 
 const NewFolderButtonWrapper = ({
   children,
@@ -12,7 +12,7 @@ const NewFolderButtonWrapper = ({
   const closeFolderDialog = () => {
     setIsFolderDialogOpen(false);
   };
-  const { singularOps } = useExplorer();
+  const createFolder = useOperationStore((state) => state.createFolder);
 
   return (
     <Dialog
@@ -20,10 +20,7 @@ const NewFolderButtonWrapper = ({
       onOpenChange={(value) => setIsFolderDialogOpen(value)}
     >
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <NewFolderDialog
-        createFolder={singularOps.createFolder}
-        close={closeFolderDialog}
-      />
+      <NewFolderDialog createFolder={createFolder} close={closeFolderDialog} />
     </Dialog>
   );
 };

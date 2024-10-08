@@ -1,11 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import React, { useState } from "react";
-import {
-  NewFolderDialog,
-  NewPasswordItemDialog,
-} from "../Header/Toolbar/NewItemButton";
-import useExplorer from "@/context/Explorer";
+import React from "react";
+
 import NewFolderButtonWrapper from "@/components/common/new-folder-button-wrapper";
 import NewPasswordButtonWrapper from "@/components/common/new-password-button-wrapper";
 

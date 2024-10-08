@@ -9,10 +9,12 @@ import {
   DialogDescription,
   DialogClose,
 } from "../ui/dialog";
-import useExplorer from "@/context/Explorer";
 import { getItemByPath } from "@/lib/explorer-utils";
-import { Folder } from "@/context/User";
 import { Button } from "../ui/button";
+import useSelectionStore from "@/store/selection";
+import useOperationStore from "@/store/operation";
+import useUserStore from "@/store/user";
+import useNavigationStore from "@/store/navigation";
 
 const DeletionPreviewTile = ({
   icon,
@@ -39,19 +41,16 @@ const DeleteItemsButtonWrapper = ({
 }: {
   children: React.ReactElement<React.ButtonHTMLAttributes<HTMLButtonElement>>;
 }) => {
+  const getOrUpdateItem = useUserStore((state) => state.getOrUpdateItem);
+  const { idPath: currentDirectoryIdPath } = useNavigationStore(
+    (state) => state.currentNavigationPiece
+  );
+  const selectedItemIds = useSelectionStore((state) => state.selectedItemIds);
+  const deleteItems = useOperationStore((state) => state.deleteItems);
+
   const [isDeletionDialogOpen, setIsDeletionDialogOpen] = useState(false);
-  const closeDeletionDialog = () => {
-    setIsDeletionDialogOpen(false);
-  };
-  const {
-    batchOps: { deleteItems },
-    selection: { selectedItemIds },
-    root: homeDirectory,
-    navigation: { currentDirectoryIdPath },
-  } = useExplorer();
-  const dir = homeDirectory
-    ? getItemByPath(currentDirectoryIdPath, homeDirectory)
-    : undefined;
+
+  const dir = getOrUpdateItem(currentDirectoryIdPath);
   const dirContents = dir ? ("contents" in dir ? dir.contents : []) : [];
 
   type SelectedItemsNames = {
@@ -99,9 +98,7 @@ const DeleteItemsButtonWrapper = ({
 
   const handleDelete = () => {
     deleteItems();
-    setTimeout(() => {
-      setIsDeletionDialogOpen(false);
-    }, 200);
+    setIsDeletionDialogOpen(false);
   };
 
   return (

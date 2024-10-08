@@ -5,11 +5,11 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const safeParse = (data: string): any => {
+export const safeParse = <T>(data: string, fallback?: T): any => {
   try {
     return JSON.parse(data);
   } catch (error) {
-    throw error;
+    return fallback;
   }
 };
 

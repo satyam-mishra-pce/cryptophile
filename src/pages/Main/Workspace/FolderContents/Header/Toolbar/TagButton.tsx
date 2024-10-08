@@ -7,7 +7,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import useStateCallback from "@/hooks/useStateCallback";
-import Color, { ColorMap } from "@/pages/Main/Sidebar/colors";
+import { Color, ColorMap } from "@/store/user/types";
 import { ChevronsUpDown } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -25,7 +25,7 @@ const TagButton = ({
     value ?? undefined
   );
 
-  const handleClick = (value: Color) => {
+  const handleClick = (value: Color | undefined) => {
     const handleOnChange = (value: Color | undefined) => {
       handleChange?.(value);
     };
@@ -48,10 +48,7 @@ const TagButton = ({
           size={"sm"}
           variant={"outline"}
           style={{
-            background: selectedColor
-              ? `rgb(${ColorMap[selectedColor]})`
-              : undefined,
-            color: selectedColor ? "white" : undefined,
+            color: selectedColor ? `rgba(${ColorMap[selectedColor]})` : "",
           }}
         >
           <i
@@ -59,15 +56,11 @@ const TagButton = ({
               selectedColor ? "fa-solid" : "fa-regular"
             } fa-tag`}
           ></i>
-          <ChevronsUpDown
-            className={`h-5 ml-2 -mr-2 text-muted-foreground ${
-              selectedColor ? "text-white/80" : "text-black/50"
-            }`}
-          />
+          <ChevronsUpDown className={`h-5 ml-2 -mr-2 text-muted-foreground`} />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem onClick={() => setSelectedColor(undefined)}>
+        <DropdownMenuItem onClick={() => handleClick(undefined)}>
           <div className="h-5 w-5 rounded-full inline-flex items-center justify-center mr-2">
             {selectedColor ? (
               <i className="fa-regular fa-circle-xmark text-muted-foreground"></i>

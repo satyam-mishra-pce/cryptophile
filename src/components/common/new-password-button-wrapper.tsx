@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Dialog, DialogTrigger } from "../ui/dialog";
 import { NewPasswordItemDialog } from "@/pages/Main/Workspace/FolderContents/Header/Toolbar/NewItemButton";
-import useExplorer from "@/context/Explorer";
+import useOperationStore from "@/store/operation";
 
 const NewPasswordButtonWrapper = ({
   children,
@@ -12,7 +12,9 @@ const NewPasswordButtonWrapper = ({
   const closePasswordDialog = () => {
     setIsPasswordDialogOpen(false);
   };
-  const { singularOps } = useExplorer();
+  const createPasswordItem = useOperationStore(
+    (state) => state.createPasswordItem
+  );
 
   return (
     <Dialog
@@ -21,7 +23,7 @@ const NewPasswordButtonWrapper = ({
     >
       <DialogTrigger asChild>{children}</DialogTrigger>
       <NewPasswordItemDialog
-        createPasswordItem={singularOps.createPassword}
+        createPasswordItem={createPasswordItem}
         close={closePasswordDialog}
       />
     </Dialog>

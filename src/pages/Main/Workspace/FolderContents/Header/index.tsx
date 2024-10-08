@@ -1,10 +1,10 @@
-import useUserContext, { Folder, PasswordItem } from "@/context/User";
-import React, { useMemo, useState } from "react";
-import { Input } from "@/components/ui/input";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import Toolbar from "./Toolbar";
-import useExplorer from "@/context/Explorer";
-import { NavigationProps } from "@/context/Explorer/Navigation";
+import useNavigationStore from "@/store/navigation";
+import { IdPath, NavigationPiece } from "@/store/navigation/types";
+import useUserStore from "@/store/user";
+import { Folder, PasswordItem } from "@/store/user/types";
 
 const BreadCrumb = ({
   idPath,
@@ -13,26 +13,21 @@ const BreadCrumb = ({
 }: {
   idPath: string[];
   namePath: string[];
-  push: (
-    path: NavigationProps,
-    clearStack?: boolean,
-    selectionItemId?: string
-  ) => void;
+  push: (path: IdPath, selectionItemId?: string, clearStack?: boolean) => void;
 }) => {
+  const idPathWithHome = ["home", ...idPath];
   return (
     <>
-      {idPath.map((itemId, idx) => {
+      {idPathWithHome.map((itemId, idx) => {
         return (
           <Button
             variant={"ghost"}
             className="font-bold text-xl px-1"
             key={itemId}
-            onClick={() =>
-              push({ path: [...idPath].slice(0, idx + 1), sourceId: itemId })
-            }
+            onClick={() => push(idPath.slice(0, idx))}
           >
             {namePath[idx]}{" "}
-            {idx !== idPath.length - 1 && (
+            {idx !== idPathWithHome.length - 1 && (
               <span>
                 {" "}
                 <i className="fa-solid fa-chevron-right text-lg text-muted-foreground ml-2 mr-1"></i>
@@ -46,19 +41,19 @@ const BreadCrumb = ({
 };
 
 const Header = () => {
-  const [user] = useUserContext();
+  const { push, pop, unpop, backStack, forwardStack, currentNavigationPiece } =
+    useNavigationStore();
 
-  const { navigation } = useExplorer();
-  const currentDirIdPath = navigation.currentDirectoryIdPath;
-  const homeDirectory = user?.userData.directory;
+  const currentDirIdPath = currentNavigationPiece.idPath;
+  const homeDirectory = useUserStore((state) => state.userDirectory);
 
   const [isBreadCrumbMode, setBreadCrumbMode] = useState(false);
 
   const getDirectoryNamePath = (): string[] => {
-    if (!homeDirectory || currentDirIdPath.length === 0) return [];
+    if (!homeDirectory) return [];
 
-    let initialContents: (Folder | PasswordItem)[] = [homeDirectory];
-    const namePath: string[] = [];
+    let initialContents: (Folder | PasswordItem)[] = homeDirectory.contents;
+    const namePath: string[] = ["Home"];
     for (let i = 0; i < currentDirIdPath.length; i++) {
       const currentItem = initialContents.find(
         (item) => item.id === currentDirIdPath[i]
@@ -81,19 +76,19 @@ const Header = () => {
           <Button
             variant="ghost"
             className=""
-            disabled={navigation.stack.length === 1}
+            disabled={backStack.length === 0}
             onClick={() => {
-              navigation.pop();
+              pop();
             }}
           >
             <i className="fa-solid fa-chevron-left text-xl"></i>
           </Button>
           <Button
             variant="ghost"
-            disabled={navigation.forwardStack.length === 0}
+            disabled={forwardStack.length === 0}
             className="mr-2"
             onClick={() => {
-              navigation.unpop();
+              unpop();
             }}
           >
             <i className="fa-solid fa-chevron-right text-xl"></i>
@@ -102,7 +97,7 @@ const Header = () => {
             <BreadCrumb
               namePath={directoryNamePath}
               idPath={currentDirIdPath}
-              push={navigation.push}
+              push={push}
             />
           ) : (
             <h1 className="font-bold text-2xl">
@@ -113,9 +108,7 @@ const Header = () => {
         <div className="flex items-center">
           <Button
             variant={currentDirIdPath.length === 1 ? "ghost" : "outline"}
-            onClick={() =>
-              navigation.push({ path: ["home"], sourceId: undefined })
-            }
+            onClick={() => push([])}
             className="mr-1 px-0 w-12"
           >
             <i className="fa-solid fa-home text-xl"></i>

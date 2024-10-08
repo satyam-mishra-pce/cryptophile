@@ -1,7 +1,7 @@
 import { useRef, useCallback, useEffect, useState } from "react";
 import type { SetStateAction } from "react";
 
-export type StateCallback<T> = (newState?: T) => void;
+export type StateCallback<T> = (newState: T) => void;
 
 export type SetStateCallbackGeneric<S> = (
   x: SetStateAction<S>,

@@ -1,11 +1,6 @@
 import { Button } from "@/components/ui/button";
-import useExplorer from "@/context/Explorer";
-import useUserContext, { Folder } from "@/context/User";
-import {
-  checkFolderByData,
-  getContentCount,
-  getItemByPath,
-} from "@/lib/explorer-utils";
+import { checkFolderByData, getContentCount } from "@/lib/explorer-utils";
+import { Folder } from "@/store/user/types";
 import React from "react";
 
 type InfoTileProps = React.HTMLAttributes<HTMLDivElement> & {
@@ -25,13 +20,7 @@ const InfoTile = ({ heading, children, ...props }: InfoTileProps) => {
   );
 };
 
-const FolderInfo = ({
-  folder,
-  idPath,
-}: {
-  folder: Folder;
-  idPath: string[];
-}) => {
+const FolderInfo = ({ folder }: { folder: Folder }) => {
   const contentCount = folder
     ? checkFolderByData(folder)
       ? getContentCount(folder)

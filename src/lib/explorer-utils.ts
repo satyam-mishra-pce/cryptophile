@@ -1,4 +1,4 @@
-import { Folder, PasswordItem } from "@/context/User";
+import { Folder, PasswordItem } from "@/store/user/types";
 
 export const generateItemId = () => {
   const characters =

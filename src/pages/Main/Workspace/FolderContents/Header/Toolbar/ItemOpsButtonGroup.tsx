@@ -1,26 +1,21 @@
 import DeleteItemsButtonWrapper from "@/components/common/delete-items-button-wrapper";
 import { Button } from "@/components/ui/button";
-import useExplorer from "@/context/Explorer";
-import { ColorMap } from "@/pages/Main/Sidebar/colors";
 import React, { useEffect, useRef } from "react";
 import TagButton from "./TagButton";
+import useSelectionStore from "@/store/selection";
+import useOperationStore from "@/store/operation";
 
 const ItemOpsButtonGroup = () => {
-  const {
-    selection: { selectedItemIds },
-    batchOps: {
-      getItemsTagByMajority,
-      setItemsTag,
-      checkFavouriteByMajority,
-      markFavouriteByMajority,
-    },
-  } = useExplorer();
+  const selectedItemIds = useSelectionStore((state) => state.selectedItemIds);
+  const { getItemsTag, setItemsTag, checkFavourites, setFavourites } =
+    useOperationStore();
 
   const noSelection = selectedItemIds.size === 0;
-  const isFavouriteByMajority = checkFavouriteByMajority();
-  const itemsTagByMajority = getItemsTagByMajority();
 
+  const isFavouriteByMajority = checkFavourites();
+  const itemsTagByMajority = getItemsTag();
   const deleteButtonRef = useRef<HTMLButtonElement>(null);
+
   useEffect(() => {
     const keyDownHandler = (evt: KeyboardEvent) => {
       const { key, shiftKey, ctrlKey, altKey, metaKey } = evt;
@@ -42,7 +37,7 @@ const ItemOpsButtonGroup = () => {
         variant={isFavouriteByMajority ? "default" : "outline"}
         disabled={noSelection}
         onClick={() => {
-          markFavouriteByMajority();
+          setFavourites();
         }}
       >
         <i

@@ -13,43 +13,39 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { TextArea } from "@/components/ui/textarea";
-import useExplorer from "@/context/Explorer";
-import { useEffect, useState } from "react";
+import { IdPath } from "@/store/navigation/types";
+import useOperationStore from "@/store/operation";
+import useSelectionStore from "@/store/selection";
+import { Folder, PasswordItem } from "@/store/user/types";
+import { useState } from "react";
 
 export const NewFolderDialog = ({
   createFolder,
   close,
 }: {
-  createFolder: (name: string, path?: string[]) => string;
+  createFolder: (
+    data: Partial<
+      Omit<Folder, "id" | "created" | "lastModified" | "isFavourite">
+    >,
+    path?: IdPath
+  ) => string;
   close: () => void;
 }) => {
-  const {
-    selection: { selectSingleItemById },
-  } = useExplorer();
+  const reselectItems = useSelectionStore((state) => state.reselectItems);
   const [folderName, setFolderName] = useState("New Folder");
-  const [newItemId, setNewItemId] = useState<string>();
-
-  useEffect(() => {
-    if (newItemId === undefined) return;
-    selectSingleItemById(newItemId);
-    setNewItemId(undefined);
-    setTimeout(() => {
-      close();
-    }, 50);
-  }, [newItemId]);
 
   const handleCreateFolder = () => {
     try {
-      const id = createFolder(folderName);
-      setNewItemId(() => {
-        return id;
+      const id = createFolder({
+        title: folderName,
+        description: "Folder",
       });
+      reselectItems([id]);
+      close();
     } catch (e) {
       alert("Error while creating password");
       console.error(e);
@@ -95,34 +91,24 @@ export const NewPasswordItemDialog = ({
   close,
 }: {
   createPasswordItem: (
-    name: string,
-    path?: string[],
-    username?: string,
-    password?: string
+    data: Partial<
+      Omit<PasswordItem, "id" | "created" | "lastModified" | "isFavourite">
+    >,
+    path?: IdPath
   ) => string;
   close: () => void;
 }) => {
-  const {
-    selection: { selectSingleItemById },
-  } = useExplorer();
+  const reselectItems = useSelectionStore((state) => state.reselectItems);
   const [passwordItemName, setPasswordItemName] = useState("New Password");
-  const [newItemId, setNewItemId] = useState<string>();
-
-  useEffect(() => {
-    if (newItemId === undefined) return;
-    selectSingleItemById(newItemId);
-    setNewItemId(undefined);
-    setTimeout(() => {
-      close();
-    }, 50);
-  }, [newItemId]);
 
   const handleCreatePassword = () => {
     try {
-      const id = createPasswordItem(passwordItemName);
-      setNewItemId(() => {
-        return id;
+      const id = createPasswordItem({
+        title: passwordItemName,
+        description: "Password",
       });
+      reselectItems([id]);
+      close();
     } catch (e) {
       alert("Error while creating password");
       console.error(e);
@@ -164,8 +150,7 @@ export const NewPasswordItemDialog = ({
 };
 
 const NewItemButton = () => {
-  const { singularOps } = useExplorer();
-  const { createFolder, createPassword } = singularOps;
+  const { createFolder, createPasswordItem } = useOperationStore();
   const [currentDialog, setCurrentDialog] = useState<
     "Folder" | "PasswordItem"
   >();
@@ -206,7 +191,7 @@ const NewItemButton = () => {
         <NewFolderDialog createFolder={createFolder} close={closeDialog} />
       ) : currentDialog === "PasswordItem" ? (
         <NewPasswordItemDialog
-          createPasswordItem={createPassword}
+          createPasswordItem={createPasswordItem}
           close={closeDialog}
         />
       ) : null}

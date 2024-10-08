@@ -1,8 +1,11 @@
 import { Button } from "@/components/ui/button";
-import useExplorer from "@/context/Explorer";
-import useUserContext, { PasswordItem } from "@/context/User";
 import { getItemByPath } from "@/lib/explorer-utils";
+import useExplorerStore from "@/store/explorer";
+import useUserStore from "@/store/user";
+import { useShallow } from "zustand/react/shallow";
+import { shallow } from "zustand/shallow";
 import React from "react";
+import { PasswordItem } from "@/store/user/types";
 
 type InfoTileProps = React.HTMLAttributes<HTMLDivElement> & {
   heading: React.ReactNode;
@@ -27,47 +30,40 @@ const InfoTile = ({ heading, children, toolbox, ...props }: InfoTileProps) => {
   );
 };
 
-const PasswordInfo = ({
-  passwordItem,
-  idPath,
-}: {
-  passwordItem: PasswordItem;
-  idPath: string[];
-}) => {
-  const {
-    config: {
-      expandedPasswordViewState: [
-        expandedPasswordView,
-        setExpandedPasswordView,
-      ],
-    },
-  } = useExplorer();
+const PasswordInfo = ({ passwordItem }: { passwordItem: PasswordItem }) => {
+  const passwordEditorMode = useExplorerStore(
+    (state) => state.passwordEditorMode
+  );
+  const setPasswordEditorMode = useExplorerStore(
+    (state) => state.setPasswordEditorMode
+  );
+
   return (
     <div className="relative w-full">
-      {!expandedPasswordView && (
+      {!passwordEditorMode && (
         <Button
           variant={"secondary"}
           className="absolute top-0 right-0 h-10 w-10 rounded-full"
-          onClick={() => setExpandedPasswordView((prev) => !prev)}
+          onClick={() => setPasswordEditorMode()}
         >
           <i className="fa-regular fa-expand"></i>
         </Button>
       )}
       <div
         className={`w-full ${
-          expandedPasswordView ? "pt-4" : ""
+          passwordEditorMode ? "pt-4" : ""
         } pb-8 flex flex-col items-center`}
       >
         <div
           className={`w-full flex ${
-            expandedPasswordView
+            passwordEditorMode
               ? "items-start border-b border-b-border pb-4 px-4"
               : "flex-col items-center"
           }`}
         >
-          {expandedPasswordView && (
+          {passwordEditorMode && (
             <Button
-              onClick={() => setExpandedPasswordView(false)}
+              onClick={() => setPasswordEditorMode(false)}
               size={"sm"}
               variant={"ghost"}
               className="mr-4"
@@ -78,7 +74,7 @@ const PasswordInfo = ({
           )}
           <div
             className={`${
-              expandedPasswordView
+              passwordEditorMode
                 ? "h-[80px] w-[80px] text-6xl"
                 : "h-[120px] w-[120px] text-8xl"
             } rounded-2xl flex items-center justify-center`}
@@ -87,7 +83,7 @@ const PasswordInfo = ({
           </div>
           <div
             className={`${
-              expandedPasswordView
+              passwordEditorMode
                 ? "ml-4 flex-1 gap-2 items-start"
                 : "mt-4 gap-4 items-center"
             } flex flex-col`}

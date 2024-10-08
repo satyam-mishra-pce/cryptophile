@@ -1,10 +1,9 @@
-import useUserContext from "@/context/User";
 import React from "react";
 import UserOptions from "./UserOptions";
 import FolderTable from "./FolderTable";
-import Color, { ColorMap } from "./colors";
 import ColorTag from "./ColorTag";
 import Favourites from "./Favourites";
+import { Color, ColorMap } from "@/store/user/types";
 
 const Sidebar = () => {
   return (
@@ -23,22 +22,6 @@ const Sidebar = () => {
               <span>Folders</span>
             </div>
             {<FolderTable />}
-          </div>
-          <div className="flex flex-col gap-1">
-            <div className="font-bold text-sm p-1">
-              <span className="">Color Tags</span>
-              <div className="rounded-md px-1 py-1 mt-2 flex gap-1">
-                {Object.keys(ColorMap).map((key) => {
-                  return (
-                    <ColorTag
-                      rgbString={ColorMap[key as Color]}
-                      key={key}
-                      isChecked
-                    />
-                  );
-                })}
-              </div>
-            </div>
           </div>
         </div>
 

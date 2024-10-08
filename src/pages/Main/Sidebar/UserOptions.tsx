@@ -1,12 +1,12 @@
 import Avatar from "@/components/common/avatar";
-import useUserContext from "@/context/User";
+import useUserStore from "@/store/user";
 import { ChevronsUpDown } from "lucide-react";
 import React from "react";
 
 type UserOptionsProps = {};
 
 const UserOptions = ({}: UserOptionsProps) => {
-  const [user] = useUserContext();
+  const user = useUserStore((state) => state.userInfo);
   return (
     <button className="bg-foreground/10 rounded-lg w-full p-2 flex hover:bg-foreground/20 justify-between items-center">
       {user && (
